@@ -1,0 +1,33 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: dev-nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../vhost:/etc/nginx/vhost
+      - ./nginx/log:/var/log/nginx
+      - ~/www/cat_framework:/data/web_data/web
+      - ~/www/base_framework:/data/web_data/yiiweb
+      - ~/www/local.test:/data/web_data/local.test
+    ports:
+      - 80:80
+      - 443:443
+    links:
+      - php71:php-fpm
+  php71:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    container_name: dev-php71
+    working_dir: /data/web_data/
+    volumes:
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - ~/www/cat_framework:/data/web_data/web
+      - ~/www/base_framework:/data/web_data/yiiweb
+      - ~/www/local.test:/data/web_data/local.test
+    ports:
+      - 9000:9000
+

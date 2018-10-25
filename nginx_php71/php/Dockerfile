@@ -1,0 +1,33 @@
+FROM php:7.1.23-fpm-stretch
+RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak \
+    && touch /etc/apt/sources.list \
+    && echo 'deb http://mirrors.163.com/debian/ stretch main non-free contrib \
+deb http://mirrors.163.com/debian/ stretch-updates main non-free contrib \
+deb http://mirrors.163.com/debian/ stretch-backports main non-free contrib \
+deb-src http://mirrors.163.com/debian/ stretch main non-free contrib \
+deb-src http://mirrors.163.com/debian/ stretch-updates main non-free contrib \
+deb-src http://mirrors.163.com/debian/ stretch-backports main non-free contrib \
+deb http://mirrors.163.com/debian-security/ stretch/updates main non-free contrib \
+deb-src http://mirrors.163.com/debian-security/ stretch/updates main non-free contrib' >> /etc/apt/sources.list
+RUN apt-get update && apt-get install -y \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libpng-dev \
+        libbz2-dev \
+        libxml2-dev \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install bcmath bz2 gd mbstring mcrypt mysqli opcache pcntl pdo_mysql shmop soap sockets sysvmsg sysvsem sysvshm zip
+RUN curl -fsSL 'http://pecl.php.net/get/redis-4.1.1.tgz' -o redis-4.1.1.tgz \
+    && pecl install redis-4.1.1.tgz \
+    && docker-php-ext-enable redis \
+    && rm -f redis-4.1.1.tgz
+RUN curl -fsSL 'http://pecl.php.net/get/swoole-4.2.3.tgz' -o swoole-4.2.3.tgz \
+    && pecl install swoole-4.2.3.tgz \
+    && docker-php-ext-enable swoole \
+    && rm -f swoole-4.2.3.tgz
+RUN apt-get install -y librdkafka-dev \
+    && curl -fsSL 'http://pecl.php.net/get/rdkafka-3.0.4.tgz' -o rdkafka-3.0.4.tgz \
+    && pecl install rdkafka-3.0.4.tgz \
+    && docker-php-ext-enable rdkafka \
+    && rm -f rdkafka-3.0.4.tgz
